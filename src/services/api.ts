@@ -8,7 +8,7 @@ const api = axios.create({
 let sessionId = localStorage.getItem('sessionId') || '';
 let schemaId = localStorage.getItem('schemaId') || null;
 
-export async function login(user: string = 'userapi', pass: string = '123'): Promise<boolean> {
+export async function login(user: string = import.meta.env.API_USER, pass: string = import.meta.env.API_PASS): Promise<boolean> {
   try {
     const res = await api.post('/Login', {
       UserName: user,
