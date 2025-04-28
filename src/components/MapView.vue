@@ -15,7 +15,7 @@ import { LineString, Polygon, Point } from 'ol/geom'
 import { Feature } from 'ol'
 import { Stroke, Style, Fill, Circle  } from 'ol/style'
 import { getTrack, getGeofenceCoords } from '@/services/api'
-import { fromLonLat, toLonLat } from 'ol/proj'
+import { fromLonLat } from 'ol/proj'
 
 const props = defineProps<{
   selectedDeviceId?: string,
@@ -61,7 +61,7 @@ watch(() => props.selectedDeviceId, async (newId) => {
   if (!newId) return
   const data = await getTrack(newId)
   const currentDevice = data[newId][0];  
-  const coords = currentDevice.Lat.map((Lat: any, indx) => fromLonLat([currentDevice.Lng[indx], Lat]));
+  const coords = currentDevice.Lat.map((Lat: any, indx: number) => fromLonLat([currentDevice.Lng[indx], Lat]));
   const lastCoord = coords[coords.length - 1];
   const line = new Feature({ geometry: new LineString(coords) });
   const marker = new Feature({
@@ -86,13 +86,12 @@ watch(() => props.selectedDeviceId, async (newId) => {
 
 watch(() => props.selectedZones, async (zoneIds) => {
   geoSource.clear();
+  const zones = await getGeofenceCoords(zoneIds.join(","));
   for (const id of zoneIds) {
-    const zone = await getGeofenceCoords(id);
-    const currentZone = zone[id];    
-    const coords = currentZone.Lat.map((Lat: any, indx) => {
+    const currentZone = await zones[id];    
+    const coords = currentZone?.Lat.map((Lat: any, indx: number) => {
       return fromLonLat([currentZone.Lng[indx], Lat])
     });
-    const lastCoord = coords[coords.length - 1];
     const poly = new Feature({ geometry: new Polygon([coords]) });
     poly.setStyle(new Style({
       stroke: new Stroke({ color: 'green', width: 2 }),

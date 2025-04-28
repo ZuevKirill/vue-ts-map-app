@@ -3,7 +3,7 @@
         <li v-if="data">
         <label>
             <input
-            :type="inputType"
+            :type="data.type === 'device' ? inputType : 'hidden'"
             :name="inputType"
             :checked="isChecked"
             @change="onChangeHandler"
